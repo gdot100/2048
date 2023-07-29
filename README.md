@@ -1,7 +1,7 @@
 # 2048
 2048 with all board sizes avaliable.
 
-Based on [2048](http://gabrielecirulli.github.io/2048)/) (also a clone).
+Based on [2048](http://gabrielecirulli.github.io/2048) (also a clone).
 
 Made just for fun. [Play it here!](https://garvey96.github.io/2048/)
 
