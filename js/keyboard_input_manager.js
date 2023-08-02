@@ -46,8 +46,17 @@ KeyboardInputManager.prototype.listen = function () {
     87: 0, // W
     68: 1, // D
     83: 2, // S
-    65: 3  // A
+    65: 3, // A
   };
+
+  var invertMap = {
+    33: "clockwise", // PgUp
+    34: "counterclockwise", // PgDn
+    81: "clockwise",
+    69: "counterclockwise",
+    190: "vertical",
+    188: "horisontal",
+  }
 
   // Respond to direction keys
   document.addEventListener("keydown", function (event) {
@@ -59,6 +68,14 @@ KeyboardInputManager.prototype.listen = function () {
       if (mapped !== undefined) {
         event.preventDefault();
         self.emit("move", mapped);
+      }
+      else
+      {
+        mapped    = invertMap[event.which];
+        if (mapped !== undefined) {
+          event.preventDefault();
+          self.emit("invert", mapped);
+        }
       }
     }
 

@@ -4,12 +4,48 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.actuator       = new Actuator;
   this.size           = this.storageManager.getSize() || size; // Size of the grid
 
-  this.startTiles     = 2;
+  this.startTiles     = 1;
 
   this.inputManager.on("move", this.move.bind(this));
+  this.inputManager.on("invert", this.invert.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
   this.setup();
+}
+
+
+
+GameManager.prototype.invert = function (dir) {
+  // create map
+  var map = Array(this.size)
+  for (let i = 0; i < this.size; i++) {
+    var row = Array(this.size)
+    map[i] = row
+    for (let j = 0; j < this.size; j++) {
+      row[j] = [i, j]
+    }
+  }
+  if(dir == "clockwise")
+  map = map[0].map((val, index) => map.map(row => row[index]).reverse())
+  if(dir == "counterclockwise")
+  map = map[0].map((val, index) => map.map(row => row[index]).reverse()).map(row => row.reverse()).slice().reverse()
+  if(dir == "vertical")
+  map.map(row => row.reverse());
+  if(dir == "horisontal")
+  map = map.slice().reverse();
+  var temp_grid = JSON.parse(JSON.stringify(this.grid.cells))
+  for (let i = 0; i < this.size; i++) {
+    for (let j = 0; j < this.size; j++) {
+      temp_grid[map[i][j][0]][map[i][j][1]] = this.grid.cells[i][j]
+      if(temp_grid[map[i][j][0]][map[i][j][1]])
+      {
+        temp_grid[map[i][j][0]][map[i][j][1]].previousPosition = {"x":i, "y": j}
+        temp_grid[map[i][j][0]][map[i][j][1]].updatePosition({"x": map[i][j][0], "y": map[i][j][1]})
+      }
+    }
+  }
+  this.grid.cells = temp_grid;
+  this.actuate()
 }
 
 // Restart the game
@@ -151,7 +187,6 @@ GameManager.prototype.addRandomTile = function () {
 // Sends the updated grid to the actuator
 GameManager.prototype.actuate = function () {
   if (this.storageManager.getBestScore(this.size) < this.score) {
-    console.log(this.size, this.score)
     this.storageManager.setBestScore(this.size, this.score);
   }
 
